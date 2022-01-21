@@ -1,0 +1,65 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Unit {
+  id                      String             @id @default(uuid())
+  name                    String
+  ingredientAmounts       IngredientAmount[]
+  yieldAmounts            YieldAmount[]
+}
+
+model Ingredient {
+  id                String    @id @default(uuid())
+  name              String
+  amounts           IngredientAmount[]
+}
+
+model IngredientAmount {
+  id                String        @id @default(uuid())
+  unitId            String
+  unit              Unit          @relation(fields: [unitId], references: [id])
+  ingredientId      String
+  ingredient        Ingredient    @relation(fields: [ingredientId], references: [id])
+  yieldId           String
+  yield             Yield         @relation(fields: [yieldId], references: [id])
+  count             Int
+}
+
+model YieldAmount {
+  id          String       @id @default(uuid())
+  unitId      String
+  unit        Unit         @relation(fields: [unitId], references: [id])
+  yield       Yield?
+}
+
+model Step {
+  id          String       @id @default(uuid())
+  description String
+  recipeId    String
+  recipe      Recipe       @relation(fields: [recipeId], references: [id])
+}
+
+model Yield {
+  id                  String             @id @default(uuid())
+  ingredientAmounts   IngredientAmount[]
+  yieldAmountId       String
+  yieldAmount         YieldAmount        @relation(fields: [yieldAmountId], references: [id])
+  recipeId            String
+  recipe              Recipe             @relation(fields: [recipeId], references: [id])
+}
+
+model Recipe {
+  id                String       @id @default(uuid())
+  name              String
+  steps             Step[]
+  yields            Yield[]
+}
